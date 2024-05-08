@@ -133,7 +133,7 @@ message(STATUS "Using c++${CMAKE_CXX_STANDARD}")
 message(STATUS "Using c++ extensions: ${CXX_EXTENSIONS}")
 
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
+# set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
 
 # add debug postfix to the libraries
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "sets the debug library postfix on mapnik, wkt and json")
@@ -392,9 +392,6 @@ add_compile_options(
 
 add_library(core INTERFACE)
 add_library(mapnik::core ALIAS core)
-
-target_include_directories(core INTERFACE /usr/local/include/freetype2)
-target_link_directories(core INTERFACE /usr/local/lib)
 
 target_include_directories(core INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

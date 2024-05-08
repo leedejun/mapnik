@@ -49,6 +49,17 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/error/en.h"
+#include <cstdio>
+#include <cstdlib>
+
+#include <QString>
+#include <QFile>
+#include <QDebug>
+#include <QTextStream>
+#include <QList>
+
 #include <QMessageBox>
 #include <QCoreApplication>
 #include <cstdlib>
@@ -223,56 +234,95 @@ void MainWindow::loadCehuiTableFields(const QString& cehuiTableIniFilePath)
     }
 }
 
-bool MainWindow::loadFeatureid2osmid(const QString& jsonPath)
-{
-   std::ifstream file(jsonPath.toStdString());
-   if (file.is_open()) {
-    // 读取文件内容到一个字符串中
-    std::string content((std::istreambuf_iterator<char>(file)),
-                        (std::istreambuf_iterator<char>()));
-    file.close();
+//bool MainWindow::loadFeatureid2osmid(const QString& jsonPath)
+//{
+//    std::ifstream file(jsonPath.toStdString());
+//    if (file.is_open()) {
+//        // 读取文件内容到一个字符串中
+//        std::string content((std::istreambuf_iterator<char>(file)),
+//                            (std::istreambuf_iterator<char>()));
+//        file.close();
+//
+//        // 使用rapidjson的Document类解析字符串
+//        rapidjson::Document doc;
+//        doc.Parse<rapidjson::kParseStopWhenDoneFlag>(content.c_str());
+//
+//        // 检查是否是有效的json文档
+//        if (doc.HasParseError()) {
+//            // 处理错误情况
+//            fprintf(stderr, "\nHasParseError: %s(pos: %u)\n",
+//            rapidjson::GetParseError_En(doc.GetParseError()),
+//            (unsigned)(doc.GetErrorOffset()));
+//
+//            return false;
+//        }
+//
+//        // 检查是否是json数组
+//        if (doc.IsArray()) {
+//            // 获取json数组
+//            rapidjson::Value& array = doc;
+//
+//            // 遍历json数组中的每个元素
+//            for (rapidjson::SizeType i = 0; i < array.Size(); i++) {
+//                // 检查是否是json数组
+//                if (array[i].IsArray()) {
+//                    // 获取json数组
+//                    rapidjson::Value& subarray = array[i];
+//
+//                    // 检查是否包含两个元素
+//                    if (subarray.Size() == 2) {
+//                        // 获取第二个元素，转换为long类型
+//                        long key = subarray[1].GetInt64();
+//
+//                        // 获取第一个元素，转换为long类型
+//                        long value = subarray[0].GetInt64();
+//
+//                        // 将键值对插入到map中
+//                        m_osmid2featureid.insert(std::make_pair(key, value));
+//                    }
+//                }
+//            }
+//
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
-    // 使用rapidjson的Document类解析字符串
-    rapidjson::Document doc;
-    doc.Parse(content.c_str());
-
-    // 检查是否是有效的json文档
-    if (doc.HasParseError()) {
-        // 处理错误情况
+bool MainWindow::loadFeatureid2osmid(const QString& jsonPath) {
+    QFile file(jsonPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "无法打开文件";
         return false;
     }
 
-    // 检查是否是json数组
-    if (doc.IsArray()) {
-        // 获取json数组
-        rapidjson::Value& array = doc;
+    QTextStream in(&file);
+    QString content = in.readAll();
+    file.close();
 
-        // 遍历json数组中的每个元素
-        for (rapidjson::SizeType i = 0; i < array.Size(); i++) {
-            // 检查是否是json数组
-            if (array[i].IsArray()) {
-                // 获取json数组
-                rapidjson::Value& subarray = array[i];
+    // 去除字符串两端的中括号
+    content.remove(0, 1);
+    content.chop(1);
 
-                // 检查是否包含两个元素
-                if (subarray.Size() == 2) {
-                    // 获取第一个元素，转换为long类型
-                    long key = subarray[1].GetInt64();
+    // 分割字符串以获取一维数组
+    QStringList rows = content.split("],[", QString::SkipEmptyParts);
 
-                    // 获取第二个元素，转换为long类型
-                    long value = subarray[0].GetInt64();
+    // 遍历一维数组
+    for (const QString &row : rows) {
+        QStringList elements = row.split(',');
+        if (elements.size() == 2) {
+            // 获取键和值，并转换为long类型
+            long key = elements.at(1).toLong();
+            long value = elements.at(0).toLong();
 
-                    // 将键值对插入到map中
-                    m_osmid2featureid.insert(std::make_pair(key, value));
-                }
-            }
+            // 将键值对插入到map中
+            m_osmid2featureid.insert(std::make_pair(key, value));
         }
-
-        return true;
     }
- }
- return false;
+
+    return true;
 }
+
 
 bool MainWindow::updateGroupidComboBox(const QString& groupidsFilePath)
 {
