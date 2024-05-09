@@ -64,6 +64,7 @@
 #include <QCoreApplication>
 #include <cstdlib>
 #include "groupinfo.hpp"
+#include "waitingspinnerwidget.h"
 
 using mapnik::layer;
 
@@ -90,6 +91,8 @@ MainWindow::MainWindow()
 
     // setCentralWidget(mapWidget_);
     setCentralWidget(mapWidget_);
+
+    // m_completeRoadsSpinner = NULL;
     createActions();
     createToolBars();
     setWindowTitle(tr("飞渡-路网融合助手"));
@@ -213,6 +216,12 @@ void MainWindow::finishCompleteRoads(const QString& groupid, const QString& vers
 
 void MainWindow::startCompleteRoads()
 {
+    //等待补录道路完成
+    // m_completeRoadsSpinner = new WaitingSpinnerWidget(this,"正在计算补录道路数据中，请稍后...");
+    // connect(this, SIGNAL(completeRoads_start_signal()),this,SLOT(completeRoads_start_slot()));
+    // connect(this, SIGNAL(completeRoads_end_signal()),this,SLOT(completeRoads_end_slot()));
+
+    // emit completeRoads_start_signal();
     mapWidget_->roadMerger->clearLayers();
     mapWidget_->roadMerger->clipedCehuiData();
     mapWidget_->roadMerger->showClipedCehuiOnMap();
@@ -224,6 +233,7 @@ void MainWindow::startCompleteRoads()
 
     m_completeRoadsAct->setCheckable(false);
     m_completeRoadsAct->setEnabled(false);
+    // emit completeRoads_end_signal();
 }
 
 void MainWindow::loadCehuiTableFields(const QString& cehuiTableIniFilePath)
@@ -398,12 +408,6 @@ void MainWindow::setCompleteRoadsFile(const QString& completeRoadsFile)
     m_completeRoadsFile = completeRoadsFile;
 }
 
-void MainWindow::setBaseInfo(const QString& base, const QString&cehui)
-{
-    m_base = base;
-    m_cehui = cehui;
-}
-
 void MainWindow::createActions()
 {
     m_toolsGroup = new QActionGroup(this);
@@ -476,10 +480,25 @@ std::shared_ptr<mapnik::Map> MainWindow::get_map()
     return mapWidget_->getMap();
 }
 
-void MainWindow::merge()
+void MainWindow::merge(QString const& base,QString const& cehui)
 {
     if(mapWidget_ && mapWidget_->roadMerger)
     {
-        mapWidget_->roadMerger->merge(m_base, m_cehui);
+        mapWidget_->roadMerger->merge(base, cehui);
     }
+}
+
+void MainWindow::completeRoads_start_slot()
+{
+    // if(m_completeRoadsSpinner)
+    // {
+    //     m_completeRoadsSpinner->start();
+    // }
+}
+void MainWindow::completeRoads_end_slot()
+{
+    // if(m_completeRoadsSpinner)
+    // {
+    //     m_completeRoadsSpinner->stop();
+    // }
 }

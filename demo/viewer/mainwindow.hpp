@@ -34,6 +34,8 @@
 
 // using namespace mapnik;
 
+class WaitingSpinnerWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -48,9 +50,7 @@ class MainWindow : public QMainWindow
     void setMidLineJsonPath(const QString& midLineJsonPath);
     void setCompleteRoadsFile(const QString& completeRoadsFilePath);
     bool updateGroupidComboBox(const QString& groupidsFilePath);
-
-
-    void setBaseInfo(const QString& base, const QString& cehui);
+    void merge(QString const& base, QString const& cehui);
 
   protected:
     void closeEvent(QCloseEvent* event);
@@ -59,6 +59,9 @@ class MainWindow : public QMainWindow
      void afterSave_signal();
      void updateCheckedItems_signal(const std::vector<cehuidataInfo>& cehuidataInfoList);
      void completeRoads_quit_signal();
+
+     void completeRoads_start_signal();
+     void completeRoads_end_signal();
 
   public slots:
     void zoom_all();
@@ -69,7 +72,9 @@ class MainWindow : public QMainWindow
     void afterSave();
     void startCompleteRoads();
     void finishCompleteRoads(const QString& groupid, const QString& version);
-    void merge();
+
+    void completeRoads_start_slot();
+    void completeRoads_end_slot();
 
     void OnItemCheckBoxChanged(const QString& id, int status);
 
@@ -100,9 +105,8 @@ class MainWindow : public QMainWindow
     CompleteRoadsWidget* m_completeRoadsWidget;
     QDockWidget* m_dockWidget;
 
-
-    QString m_base;
-    QString m_cehui;
+    //等待补录道路数据导出
+    // WaitingSpinnerWidget* m_completeRoadsSpinner;
 
 };
 

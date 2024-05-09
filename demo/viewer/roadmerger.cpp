@@ -72,6 +72,10 @@ typedef std::shared_ptr<geometry::multi_polygon<double>> MultiPolygonPtr;
 #define  DIRECTIONKEY "direction"
 #endif
 
+#ifndef  LonLatPrecision
+#define LonLatPrecision 8
+#endif
+
 using namespace rapidjson;
 
 
@@ -341,7 +345,7 @@ std::string RoadMerger::convertToCustomText(const mapnik::geometry::line_string<
     std::stringstream wktStream;
     wktStream << "";
     for (const auto& point : lineString) {
-        wktStream << point.x << "," << point.y << ";";
+        wktStream << std::fixed << std::setprecision(LonLatPrecision) << point.x << "," << point.y << ";";
     }
     wktStream.seekp(-1, std::ios_base::end); // 移除最后一个逗号
     wktStream << "";
@@ -954,12 +958,19 @@ void RoadMerger::clipedCehuiData()
                        {
                            context_ptr contextPtr = std::make_shared<mapnik::context_type>();
                            feature_ptr feature(feature_factory::create(contextPtr, count));
+
+                           //id
                            int64_t id = fd::generate_global_id();
                            std::string sID = QString::number(id).toStdString();
                            icu::UnicodeString unicodeString = icu::UnicodeString::fromUTF8(icu::StringPiece(sID.c_str()));
                            mapnik::value val = unicodeString;
                            feature->put_new(IDKEY, val);
-                           feature->put_new(nameFieldName,cloneFeat->get(nameFieldName));
+                           std::string nameStr = cloneFeat->get(nameFieldName).to_string() + "_" + std::to_string(i);
+
+                           //name
+                           icu::UnicodeString unicodeName = icu::UnicodeString::fromUTF8(icu::StringPiece(nameStr.c_str()));
+                           mapnik::value nameVal = unicodeName;
+                           feature->put_new(nameFieldName, nameVal);
                            feature->put_new(dirFieldName,cloneFeat->get(dirFieldName));
                            feature->put_new(NeedAddCehui_RESULT, 1);
                            feature->set_geometry(mapnik::geometry::geometry<double>(lines.at(i)));
