@@ -333,7 +333,7 @@ std::string RoadMerger::convertToWKT(const mapnik::geometry::line_string<double>
     wktStream << "LINESTRING (";
     for (const auto& point : lineString) 
     {
-        wktStream << point.x << " " << point.y << ",";
+        wktStream << std::fixed << std::setprecision(LonLatPrecision) << point.x << " " << point.y << ",";
     }
 
     std::string wkt = wktStream.str();
