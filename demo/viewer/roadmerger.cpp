@@ -331,42 +331,59 @@ std::string RoadMerger::convertToWKT(const mapnik::geometry::line_string<double>
     // 将geometry::line_string<double>转换为WKT格式
     std::stringstream wktStream;
     wktStream << "LINESTRING (";
-    for (const auto& point : lineString) {
+    for (const auto& point : lineString) 
+    {
         wktStream << point.x << " " << point.y << ",";
     }
-    wktStream.seekp(-1, std::ios_base::end); // 移除最后一个逗号
-    wktStream << ")";
-    return wktStream.str();
+
+    std::string wkt = wktStream.str();
+    if (!wkt.empty() && lineString.size()>0) {
+        wkt.erase(wkt.size() - 1); // 删除最后一个字符（分号）
+    }
+
+    wkt = wkt + ")";
+    return wkt;
 }
 
 std::string RoadMerger::convertToCustomText(const mapnik::geometry::line_string<double>& lineString)
 {
     // 将geometry::line_string<double>转换为WKT格式
-    std::stringstream wktStream;
-    wktStream << "";
+    std::stringstream customStream;
     for (const auto& point : lineString) {
-        wktStream << std::fixed << std::setprecision(LonLatPrecision) << point.x << "," << point.y << ";";
+        customStream << std::fixed << std::setprecision(LonLatPrecision) << point.x << "," << point.y << ";";
     }
-    wktStream.seekp(-1, std::ios_base::end); // 移除最后一个逗号
-    wktStream << "";
-    return wktStream.str();
+
+    std::string customText = customStream.str();
+    if (!customText.empty()) {
+        customText.erase(customText.size() - 1); // 删除最后一个字符（分号）
+    }
+    return customText;
 }
 
 std::string RoadMerger::convertToWKT(const mapnik::geometry::multi_line_string<double>& multiLineString)
 {
     std::stringstream wktStream;
     wktStream << "MULTILINESTRING (";
-    for (const auto& segment : multiLineString) {
+    for (int i =0; i<multiLineString.size(); ++i) 
+    {
+        const auto& segment = multiLineString[i];
         wktStream << "(";
-        for (const auto& point : segment) {
-            wktStream << point.x << " " << point.y << ",";
+        for (int j = 0; j< segment.size(); ++j) 
+        {
+            const auto& point = segment[j];
+            wktStream << std::fixed << std::setprecision(LonLatPrecision) << point.x << " " << point.y;
+            if(j!=segment.size()-1)
+            {
+                wktStream << ",";
+            }
         }
-        wktStream.seekp(-1, std::ios_base::end); // 移除最后一个逗号
-        wktStream << "),";
+        wktStream << ")";
+        if(i!=multiLineString.size()-1)
+        {
+            wktStream << ",";
+        }
     }
-    wktStream.seekp(-1, std::ios_base::end); // 移除最后一个逗号
     wktStream << ")";
-
     return wktStream.str();
 }
 
@@ -781,14 +798,10 @@ void RoadMerger::clipedLineEx(mapnik::geometry::geometry<double>& in,
                     {
                         mapnik::geometry::multi_point<double> intersection_points;
                         boost::geometry::intersection(line, poly, intersection_points);
-                        std::cout<<"intersection_points' count:"<< intersection_points.size() <<std::endl;
                         if(intersection_points.size())
                         {
                             for(int i=0;i<intersection_points.size();i++)
                             {
-                                std::cout<<"intersection_points' count:"<< intersection_points.size() <<std::endl;
-                                std::cout<<"intersection_points["<<i<<"] x:"<< intersection_points[i].x <<std::endl;
-                                std::cout<<"intersection_points["<<i<<"] y:"<< intersection_points[i].y <<std::endl;
                                 allIntersection_points.push_back(intersection_points[i]);
                             }
                         }
@@ -804,7 +817,6 @@ void RoadMerger::clipedLineEx(mapnik::geometry::geometry<double>& in,
         {
             result.push_back(line);
             out = result;
-            std::cout<<"in.is geometry::line_string. It is disjoint."<<std::endl;
             return;
         }
 
@@ -900,7 +912,6 @@ void RoadMerger::clipedLineEx(mapnik::geometry::geometry<double>& in,
 
 void RoadMerger::OnItemCheckBoxChanged(const QString& id, int status)
 {
-    std::cout<<"begin OnItemCheckBoxChanged"<<std::endl;
     query q(clipedCehuiSource->envelope());
     q.add_property_name(IDKEY);
     q.add_property_name(NeedAddCehui_RESULT);
@@ -916,7 +927,6 @@ void RoadMerger::OnItemCheckBoxChanged(const QString& id, int status)
     }
 
     mapWidget->updateMap();
-    std::cout<<"end OnItemCheckBoxChanged"<<std::endl;
 }
 
 void RoadMerger::clipedCehuiData()
@@ -965,9 +975,9 @@ void RoadMerger::clipedCehuiData()
                            icu::UnicodeString unicodeString = icu::UnicodeString::fromUTF8(icu::StringPiece(sID.c_str()));
                            mapnik::value val = unicodeString;
                            feature->put_new(IDKEY, val);
-                           std::string nameStr = cloneFeat->get(nameFieldName).to_string() + "_" + std::to_string(i);
 
                            //name
+                           std::string nameStr = cloneFeat->get(nameFieldName).to_string() + "-" + std::to_string(i);
                            icu::UnicodeString unicodeName = icu::UnicodeString::fromUTF8(icu::StringPiece(nameStr.c_str()));
                            mapnik::value nameVal = unicodeName;
                            feature->put_new(nameFieldName, nameVal);
