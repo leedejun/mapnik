@@ -82,6 +82,10 @@ MapWidget::MapWidget(QWidget* parent)
     spinner = new WaitingSpinnerWidget(this,"正在进行数据融合中，请稍后...");
     connect(roadMerger, &RoadMerger::signalMergeStart,this,&MapWidget::onMergeStart);
     connect(roadMerger, &RoadMerger::signalMergeEnd,this,&MapWidget::onMergeEnd);
+
+
+    connect(roadMerger, &RoadMerger::signalClipedCehuiDataStart,this,&MapWidget::onClipedCehuiDataStart);
+    connect(roadMerger, &RoadMerger::signalClipedCehuiDataEnd,this,&MapWidget::onClipedCehuiDataEnd);
 }
 
 MapWidget::~MapWidget()
@@ -98,6 +102,17 @@ void MapWidget::onMergeEnd()
 {
     roadMerger->showRoadLayers();
     spinner->stop();
+}
+
+void MapWidget::onClipedCehuiDataStart()
+{
+    spinner->setText("正在计算补录道路数据中，请稍后...");
+    spinner->start();
+}
+void MapWidget::onClipedCehuiDataEnd()
+{
+    spinner->stop();
+    emit clipedCehuiDataFinished();
 }
 
 void MapWidget::setTool(eTool tool)

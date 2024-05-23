@@ -96,6 +96,7 @@ MainWindow::MainWindow()
     createToolBars();
     setWindowTitle(tr("飞渡-路网融合助手"));
     resize(800, 600);
+    connect(mapWidget_, SIGNAL(clipedCehuiDataFinished()),this,SLOT(previewCompleteRoadsResult()));
 }
 
 MainWindow::~MainWindow()
@@ -215,24 +216,21 @@ void MainWindow::finishCompleteRoads(const QString& groupid, const QString& vers
 
 void MainWindow::startCompleteRoads()
 {
-    //等待补录道路完成
-    // m_completeRoadsSpinner = new WaitingSpinnerWidget(this,"正在计算补录道路数据中，请稍后...");
-    // connect(this, SIGNAL(completeRoads_start_signal()),this,SLOT(completeRoads_start_slot()));
-    // connect(this, SIGNAL(completeRoads_end_signal()),this,SLOT(completeRoads_end_slot()));
-
-    // emit completeRoads_start_signal();
     mapWidget_->roadMerger->clearLayers();
-    mapWidget_->roadMerger->clipedCehuiData();
+    m_completeRoadsAct->setCheckable(false);
+    m_completeRoadsAct->setEnabled(false);
+    mapWidget_->roadMerger->setTaskType(RoadMerger::TaskType::ClipedCehuiData);
+    mapWidget_->roadMerger->start();
+}
+
+void MainWindow::previewCompleteRoadsResult()
+{
     mapWidget_->roadMerger->showClipedCehuiOnMap();
     std::map<std::string, std::vector<cehuidataInfo>> result;
     mapWidget_->roadMerger->getCompleteRoadsResult(result);
     qDebug() << "startCompleteRoads:result size" << result.size();
     emit updateCheckedItems_signal(result);
     m_dockWidget->setVisible(true);
-
-    m_completeRoadsAct->setCheckable(false);
-    m_completeRoadsAct->setEnabled(false);
-    // emit completeRoads_end_signal();
 }
 
 void MainWindow::loadCehuiTableFields(const QString& cehuiTableIniFilePath)
@@ -485,19 +483,4 @@ void MainWindow::merge(QString const& base, QMap<QString, QString> const& cehui)
     {
         mapWidget_->roadMerger->merge(base, cehui);
     }
-}
-
-void MainWindow::completeRoads_start_slot()
-{
-    // if(m_completeRoadsSpinner)
-    // {
-    //     m_completeRoadsSpinner->start();
-    // }
-}
-void MainWindow::completeRoads_end_slot()
-{
-    // if(m_completeRoadsSpinner)
-    // {
-    //     m_completeRoadsSpinner->stop();
-    // }
 }
