@@ -13,7 +13,10 @@ project(mapnik
 )
 message(STATUS "mapnik version: ${PROJECT_VERSION}")
 
-set(CMAKE_INSTALL_RPATH "$ORIGIN/../depends")
+
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+#set(CMAKE_INSTALL_RPATH "$ORIGIN/../depends")
 # https://cliutils.gitlab.io/modern-cmake/chapters/features/ides.html
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -42,13 +45,13 @@ mapnik_option(USE_EXTERNAL_MAPBOX_PROTOZERO "Use a external mapnik/protozero. If
 mapnik_option(USE_EXTERNAL_MAPBOX_VARIANT "Use a external mapnik/variant. If off, use the submodule" OFF)
 mapnik_option(USE_JPEG "adds jpeg support" ON)
 mapnik_option(USE_PNG "adds png support" ON)
-mapnik_option(USE_TIFF "adds tiff support" ON)
-mapnik_option(USE_WEBP "adds webp support" ON)
-mapnik_option(USE_LIBXML2 "adds libxml2 support" ON)
-mapnik_option(USE_CAIRO "adds the cairo renderer" ON)
-mapnik_option(USE_PROJ "adds proj support" ON)
-mapnik_option(USE_GRID_RENDERER "adds grid renderer" ON)
-mapnik_option(USE_SVG_RENDERER "adds svg renderer" ON)
+mapnik_option(USE_TIFF "adds tiff support" OFF)
+mapnik_option(USE_WEBP "adds webp support" OFF)
+mapnik_option(USE_LIBXML2 "adds libxml2 support" OFF)
+mapnik_option(USE_CAIRO "adds the cairo renderer" OFF)
+mapnik_option(USE_PROJ "adds proj support" OFF)
+mapnik_option(USE_GRID_RENDERER "adds grid renderer" OFF)
+mapnik_option(USE_SVG_RENDERER "adds svg renderer" OFF)
 mapnik_option(USE_BIGINT "uses 64 bit instead of 32" ON)
 mapnik_option(USE_BOOST_FILESYSTEM "use boost::filesytem even if `std::filesystem` is available (since c++17)" OFF)
 mapnik_option(USE_MEMORY_MAPPED_FILE "uses file cache" ON)
@@ -66,30 +69,30 @@ mapnik_option(USE_STATS "Enable statistics reporting" OFF)
 
 mapnik_option(DISABLE_MAPNIK_AUTOSETUP "disables the autosetup. Need to call mapnik::setup() then" OFF)
 
-mapnik_option(USE_PLUGIN_INPUT_CSV "adds plugin input csv" ON)
-mapnik_option(USE_PLUGIN_INPUT_GDAL "adds plugin input gdal" ON)
-mapnik_option(USE_PLUGIN_INPUT_GEOBUF "adds plugin input geobuf" ON)
-mapnik_option(USE_PLUGIN_INPUT_GEOJSON "adds plugin input geojson" ON)
-mapnik_option(USE_PLUGIN_INPUT_OGR "adds plugin input ogr" ON)
-mapnik_option(USE_PLUGIN_INPUT_PGRASTER "adds plugin input pgraster" ON)
-mapnik_option(USE_PLUGIN_INPUT_POSTGIS "adds plugin input postgis" ON)
+mapnik_option(USE_PLUGIN_INPUT_CSV "adds plugin input csv" OFF)
+mapnik_option(USE_PLUGIN_INPUT_GDAL "adds plugin input gdal" OFF)
+mapnik_option(USE_PLUGIN_INPUT_GEOBUF "adds plugin input geobuf" OFF)
+mapnik_option(USE_PLUGIN_INPUT_GEOJSON "adds plugin input geojson" OFF)
+mapnik_option(USE_PLUGIN_INPUT_OGR "adds plugin input ogr" OFF)
+mapnik_option(USE_PLUGIN_INPUT_PGRASTER "adds plugin input pgraster" OFF)
+mapnik_option(USE_PLUGIN_INPUT_POSTGIS "adds plugin input postgis" OFF)
 mapnik_option(USE_PLUGIN_INPUT_RASTER "adds plugin input raster" ON)
 mapnik_option(USE_PLUGIN_INPUT_SHAPE "adds plugin input shape" ON)
-mapnik_option(USE_PLUGIN_INPUT_SQLITE "adds plugin input sqlite" ON)
-mapnik_option(USE_PLUGIN_INPUT_TOPOJSON "adds plugin input topojson" ON)
+mapnik_option(USE_PLUGIN_INPUT_SQLITE "adds plugin input sqlite" OFF)
+mapnik_option(USE_PLUGIN_INPUT_TOPOJSON "adds plugin input topojson" OFF)
 
 mapnik_option(BUILD_DEMO_VIEWER "builds the demo viewer" ON)
-mapnik_option(BUILD_DEMO_CPP "builds the demo c++ application" ON)
+mapnik_option(BUILD_DEMO_CPP "builds the demo c++ application" OFF)
 
-mapnik_option(BUILD_BENCHMARK "builds benchmark project" ON)
+mapnik_option(BUILD_BENCHMARK "builds benchmark project" OFF)
 
-mapnik_option(BUILD_UTILITY_GEOMETRY_TO_WKB "builds the utility program geometry_to_wkb" ON)
-mapnik_option(BUILD_UTILITY_MAPNIK_INDEX "builds the utility program mapnik_index" ON)
-mapnik_option(BUILD_UTILITY_MAPNIK_RENDER "builds the utility program mapnik_render" ON)
+mapnik_option(BUILD_UTILITY_GEOMETRY_TO_WKB "builds the utility program geometry_to_wkb" OFF)
+mapnik_option(BUILD_UTILITY_MAPNIK_INDEX "builds the utility program mapnik_index" OFF)
+mapnik_option(BUILD_UTILITY_MAPNIK_RENDER "builds the utility program mapnik_render" OFF)
 mapnik_option(BUILD_UTILITY_OGRINDEX "builds the utility program ogrindex" OFF)
-mapnik_option(BUILD_UTILITY_PGSQL2SQLITE "builds the utility program pgsql2sqlite" ON)
-mapnik_option(BUILD_UTILITY_SHAPEINDEX "builds the utility program shapeindex" ON)
-mapnik_option(BUILD_UTILITY_SVG2PNG "builds the utility program svg2png" ON)
+mapnik_option(BUILD_UTILITY_PGSQL2SQLITE "builds the utility program pgsql2sqlite" OFF)
+mapnik_option(BUILD_UTILITY_SHAPEINDEX "builds the utility program shapeindex" OFF)
+mapnik_option(BUILD_UTILITY_SVG2PNG "builds the utility program svg2png" OFF)
 
 mapnik_option(USE_BOOST_REGEX_ICU_WORKAROUND "if you don't use your system libraries and get double linked icu libraries set this to ON" OFF)
 mapnik_option(USE_GLIBC_WORKAROUND "see https://github.com/mapnik/mapnik/pull/3792 if you building with libstdc++-4.9" OFF)
@@ -158,14 +161,27 @@ endif()
 
 mapnik_find_package(PkgConfig REQUIRED)
 mapnik_find_threads()
-mapnik_find_package(ICU REQUIRED COMPONENTS uc i18n data)
 
-mapnik_find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS regex)
+set(ICU_ROOT "/usr/local/icu")
+mapnik_find_package(ICU REQUIRED COMPONENTS uc i18n data)
+#set(ICU:uc "/usr/local/icu/lib/libicuuc.a")
+#set(ICU:i18n "/usr/local/icu/lib/libicui18n.a")
+#set(ICU:data "/usr/local/icu/lib/libicudata.a")
+
+#mapnik_find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS regex)
+#set(Boost:regex "/usr/local/boost-1.73/lib/libboost_regex.a")
+set(BOOST_ROOT "/usr/local/boost-1.73")
+set(BOOST_INCLUDEDIR "${BOOST_ROOT}/include")
+set(BOOST_LIBRARYDIR "${BOOST_ROOT}/lib")
+set(Boost_NO_SYSTEM_PATHS ON)
+
+find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS regex)
+
 if(CMAKE_CXX_STANDARD VERSION_LESS 17)
     set(USE_BOOST_FILESYSTEM ON CACHE BOOL "Use boost::filesystem" FORCE)
 endif()
 if(USE_BOOST_FILESYSTEM)
-    mapnik_find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS filesystem system)
+    find_package(Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS filesystem system)
 endif()
 
 list(APPEND MAPNIK_COMPILE_DEFS BOOST_REGEX_HAS_ICU)
@@ -272,7 +288,7 @@ endif()
 
 if(USE_BOOST_FILESYSTEM)
     list(APPEND MAPNIK_COMPILE_DEFS USE_BOOST_FILESYSTEM)
-    list(APPEND MAPNIK_OPTIONAL_LIBS Boost::filesystem)
+    #list(APPEND MAPNIK_OPTIONAL_LIBS Boost::filesystem)
 endif()
 
 if(USE_MEMORY_MAPPED_FILE)
@@ -408,13 +424,16 @@ target_include_directories(core INTERFACE
     $<INSTALL_INTERFACE:include>
     ${MAPNIK_OPTIONAL_LIBS_INCLUDE}
 )
+
 target_link_libraries(core INTERFACE
     Threads::Threads
     ICU::uc
     ICU::data
     ICU::i18n
     Boost::headers
-    Boost::regex
+    #Boost::regex
+    /usr/local/boost-1.73/lib/libboost_regex.a
+    /usr/local/boost-1.73/lib/libboost_filesystem.a
     Freetype::Freetype
     ${MAPNIK_OPTIONAL_LIBS}
 )
@@ -443,7 +462,7 @@ if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
 if(BUILD_TESTING)
-    add_subdirectory(test)
+   add_subdirectory(test)
 endif()
 file(COPY fonts DESTINATION "${MAPNIK_OUTPUT_DIR}")
 

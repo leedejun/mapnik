@@ -21,7 +21,8 @@ target_include_directories(json PRIVATE
     ${MAPBOX_GEOMETRY_INCLUDE_DIRS}
     ${MAPBOX_VARIANT_INCLUDE_DIRS}
 )
-target_link_libraries(json PRIVATE mapnik::core ${ICUU_LIB})
+#target_link_libraries(json PRIVATE mapnik::core ${ICUU_LIB})
+target_link_libraries(json PRIVATE mapnik::mapnik ${ICUU_LIB})
 
 set_target_properties(json PROPERTIES
     POSITION_INDEPENDENT_CODE ON
