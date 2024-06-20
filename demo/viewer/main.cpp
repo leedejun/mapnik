@@ -32,6 +32,7 @@
 #include "rapidjson/error/en.h"
 #include <iostream>
 #include <fstream>
+#include <windows.h>
 
 
 namespace fd{
@@ -114,6 +115,12 @@ void loadMergemapIniFile(const QString& mergemapIniFile, MergemapParam& mergPara
 
 int main(int argc, char** argv)
 {
+    BOOL success = SetDllDirectory(TEXT("./"));
+    if (!success) {
+	    // 设置路径失败，进行错误处理
+        std::cerr << "设置路径失败，进行错误处理!"  << "'\n";
+        return -1;
+    }
     using mapnik::datasource_cache;
     using mapnik::freetype_engine;
     try
