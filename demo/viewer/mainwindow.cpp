@@ -369,16 +369,21 @@ bool MainWindow::loadFeatureid2osmid(const QString& jsonPath) {
 bool MainWindow::updateGroupidComboBox(const QString& groupidsFilePath)
 {
     std::vector<GroupInfo> groupInfoList;
-    std::ifstream file(groupidsFilePath.toStdString());
-    if (file.is_open()) {
-        // 读取文件内容到一个字符串中
-        std::string content((std::istreambuf_iterator<char>(file)),
-                            (std::istreambuf_iterator<char>()));
+    QFile file(groupidsFilePath); // groupidsFilePath 是一个 QString 对象
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
+         QTextStream in(&file);
+        // 设置 QTextStream 的编码为 UTF-8
+        in.setCodec("UTF-8");
+        QString content = in.readAll();
         file.close();
+
+        // 现在 content 字符串包含 UTF-8 编码的文件内容
+        // 你可以将其转换为 std::string，如果需要的话
+        std::string contentUtf8 = content.toStdString();
 
         // 使用 rapidjson::Document 解析 JSON 字符串
         rapidjson::Document doc;
-        doc.Parse(content.c_str());
+        doc.Parse(contentUtf8.c_str());
 
         // 检查是否有解析错误
         if (doc.HasParseError()) {

@@ -136,7 +136,7 @@ int main(int argc, char** argv)
         else
         {
          std::cout<<"arcv[0]:"<<argv[0]<<std::endl;
-         std::cout<<" arcv[1]:"<<argv[1]<<std::endl;
+         std::cout<<"arcv[1]:"<<argv[1]<<std::endl;
         }
 
         QString mergemapIniFilePath = argv[1];
