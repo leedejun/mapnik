@@ -114,6 +114,8 @@ class MainWindow : public QMainWindow
     int m_msecInterval;
     int m_blinkCount;
     const int m_maxBlinks;
+
+    bool m_iniGroupidComboBox;
 };
 
 #endif // MAINWINDOW_HPP

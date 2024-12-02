@@ -67,7 +67,8 @@
 
 using mapnik::layer;
 
-MainWindow::MainWindow():m_timer(new QTimer(this)),m_msecInterval(200), m_blinkCount(0), m_maxBlinks(3)
+MainWindow::MainWindow():m_timer(new QTimer(this)),m_msecInterval(200), m_blinkCount(0), m_maxBlinks(3),
+m_iniGroupidComboBox(false)
 {
     mapWidget_ = new MapWidget(this);
 
@@ -195,8 +196,8 @@ void MainWindow::save()
 
 void MainWindow::afterSave()
 {
-    m_completeRoadsAct->setCheckable(true);
-    m_completeRoadsAct->setEnabled(true);
+    m_completeRoadsAct->setCheckable(m_iniGroupidComboBox);
+    m_completeRoadsAct->setEnabled(m_iniGroupidComboBox);
 
     m_saveAct->setCheckable(false);
     m_saveAct->setEnabled(false);
@@ -368,6 +369,7 @@ bool MainWindow::loadFeatureid2osmid(const QString& jsonPath) {
 
 bool MainWindow::updateGroupidComboBox(const QString& groupidsFilePath)
 {
+    m_iniGroupidComboBox = false;
     std::vector<GroupInfo> groupInfoList;
     QFile file(groupidsFilePath); // groupidsFilePath 是一个 QString 对象
     if (file.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -430,6 +432,7 @@ bool MainWindow::updateGroupidComboBox(const QString& groupidsFilePath)
         {
             m_completeRoadsWidget->updateGroupidComboBox(groupInfoList);
         }
+        m_iniGroupidComboBox = true;
         return true;
     }
     return false;

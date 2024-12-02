@@ -499,7 +499,7 @@ void render_agg(mapnik::Map const& map, double scaling_factor, QPixmap& pix)
 
     try
     {
-        mapnik::auto_cpu_timer t(std::clog, "rendering took: ");
+        //mapnik::auto_cpu_timer t(std::clog, "rendering took: ");
         ren.apply();
         QImage image((uchar*)buf.data(), width, height, QImage::Format_ARGB32);
         pix = QPixmap::fromImage(image.rgbSwapped());
@@ -531,7 +531,7 @@ void render_cairo(mapnik::Map const& map, double scaling_factor, QPixmap& pix)
     mapnik::cairo_ptr cairo = mapnik::create_context(image_surface);
     if (cairo)
     {
-        mapnik::auto_cpu_timer t(std::clog, "rendering took: ");
+        //mapnik::auto_cpu_timer t(std::clog, "rendering took: ");
         mapnik::cairo_renderer<mapnik::cairo_ptr> renderer(map, cairo, scaling_factor);
         renderer.apply();
     }

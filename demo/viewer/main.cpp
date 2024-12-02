@@ -180,8 +180,8 @@ int main(int argc, char** argv)
         QString groupidsPath = mergParam.groupidsPath;
         if(!window.updateGroupidComboBox(groupidsPath))
         {
-          std::cerr << "updateGroupidComboBox failed!"  << "'\n";
-          return 1;
+          std::cout << "updateGroupidComboBox failed!"  << "'\n";
+          //return 1;
         }
 
         window.setMidLineJsonPath(mergParam.midlinePath);
