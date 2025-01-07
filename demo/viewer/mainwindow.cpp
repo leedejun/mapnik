@@ -183,11 +183,28 @@ void MainWindow::save()
       file << json;
       file.close();
       // 弹出一个对话框，显示文件生成完成的消息
-      QMessageBox::information(nullptr, "完成", "成功生成midLine.json");
+      //QMessageBox::information(nullptr, "完成", "成功生成midLine.json");
+      QMessageBox msgBox;
+      msgBox.setIcon(QMessageBox::Information);
+      msgBox.setWindowTitle("完成");
+      msgBox.setText("成功生成midLine.json");
+      msgBox.setStandardButtons(QMessageBox::Ok);
+      msgBox.setDefaultButton(QMessageBox::Ok);
+      msgBox.setButtonText(QMessageBox::Ok, QObject::tr("确定"));
+      msgBox.exec();
+
      }
      else
     {
-      QMessageBox::critical(nullptr, "错误", "无法打开文件");
+      //QMessageBox::critical(nullptr, "错误", "无法打开文件");
+      QMessageBox msgBox;
+      msgBox.setIcon(QMessageBox::Critical);
+      msgBox.setWindowTitle("错误");
+      msgBox.setText("无法打开文件");
+      msgBox.setStandardButtons(QMessageBox::Ok);
+      msgBox.setDefaultButton(QMessageBox::Ok);
+      msgBox.setButtonText(QMessageBox::Ok, QObject::tr("确定"));
+      msgBox.exec();
     }
 
     emit afterSave_signal();
@@ -335,7 +352,7 @@ void MainWindow::loadCehuiTableFields(const QString& cehuiTableIniFilePath)
 bool MainWindow::loadFeatureid2osmid(const QString& jsonPath) {
     QFile file(jsonPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "无法打开文件";
+        qDebug() << "无法打开文件:"<<jsonPath;
         return false;
     }
 
