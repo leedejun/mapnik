@@ -524,13 +524,30 @@ bool RoadMerger::SerializeCompleteRoadInfos(const std::map<std::string, std::vec
 
         qDebug() << "SerializeCompleteRoadInfos finished.";
         // 弹出一个对话框，显示文件生成完成的消息
-        QMessageBox::information(nullptr, "完成", "成功生成补全道路数据");
+        //QMessageBox::information(nullptr, "完成", "成功生成补全道路数据");
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.setWindowTitle("完成");
+        msgBox.setText("成功生成补全道路数据");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok, QObject::tr("确定"));
+        msgBox.exec();
+
         return true;
     }
     else
     {
         qDebug() << "SerializeCompleteRoadInfos fail.";
-        QMessageBox::critical(nullptr, "错误", "无法打开文件");
+        //QMessageBox::critical(nullptr, "错误", "无法打开文件");
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setWindowTitle("错误");
+        msgBox.setText("无法打开文件");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setButtonText(QMessageBox::Ok, QObject::tr("确定"));
+        msgBox.exec();
         return false;
     }
 }

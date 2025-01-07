@@ -64,9 +64,12 @@ void CompleteRoadsWidget::updateVersionComboBox(int index)
         m_groupversionComboBox->clear(); // 清空 m_groupversionComboBox 的当前列表
         // 根据 m_groupidComboBox 选择的不同，为 m_groupversionComboBox 添加不同的选项
         GroupInfo data = m_groupidComboBox->itemData(index).value<GroupInfo>();
+        int index = 0;
         for (int number : data.versions) 
         {
-            m_groupversionComboBox->addItem(QString::number(number));
+            m_groupversionComboBox->addItem(QString("V0.0.") + QString::number(number));
+            m_groupversionComboBox->setItemData(index,QString::number(number));
+            index++;
         }
     }
 }
@@ -203,6 +206,7 @@ void CompleteRoadsWidget::submitCheckedItems()
     int index = m_groupidComboBox->currentIndex();
     GroupInfo data = m_groupidComboBox->itemData(index).value<GroupInfo>();
     QString id = data.id;
-    QString version = m_groupversionComboBox->currentText();
+    int versionIndex = m_groupversionComboBox->currentIndex();
+    QString version = m_groupversionComboBox->itemData(versionIndex).value<QString>();
     emit exportCompleteRoads_signal(data.id, version);
 }
